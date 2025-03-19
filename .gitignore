@@ -1,0 +1,6 @@
+.env
+*/__pycache__
+react_debug.log
+*/react_debug.log
+react_summary.json
+*/react_summary.json

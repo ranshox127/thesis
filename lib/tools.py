@@ -3,6 +3,7 @@ from duckduckgo_search import DDGS
 from typing import List, Dict
 import requests
 import re
+from readability import Document
 from bs4 import BeautifulSoup
 
 TOKEN_LIMIT = 20000
@@ -29,11 +30,10 @@ def search(query: str, max_results: int = 15) -> List[Dict]:
             try:
                 response = requests.get(url, timeout=5)
                 if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    for script in soup(["script", "style", "nav", "footer", "header"]):
-                        script.extract()
+                    html_content = response.text
 
-                    main_content = extract_main_content(soup)
+                    # 使用 readability 提取主要內容
+                    main_content = extract_main_content_readability(html_content)
                     content_tokens = num_tokens_from_string(main_content)
 
                     # 檢查是否超過 token 限制
@@ -41,8 +41,7 @@ def search(query: str, max_results: int = 15) -> List[Dict]:
                         if len(processed_results) == 0:
                             # 如果沒有任何結果，仍然返回第一個搜尋結果
                             processed_results.append(
-                                {"title": title, "url": url,
-                                    "content": main_content}
+                                {"title": title, "url": url, "content": main_content}
                             )
                         break  # 達到限制則立即返回結果
 
@@ -62,11 +61,10 @@ def search(query: str, max_results: int = 15) -> List[Dict]:
                 try:
                     response = requests.get(url, timeout=5)
                     if response.status_code == 200:
-                        soup = BeautifulSoup(response.text, 'html.parser')
-                        for script in soup(["script", "style", "nav", "footer", "header"]):
-                            script.extract()
+                        html_content = response.text
 
-                        main_content = extract_main_content(soup)
+                        # 使用 readability 提取主要內容
+                        main_content = extract_main_content_readability(html_content)
                         content_tokens = num_tokens_from_string(main_content)
 
                         processed_results.append(
@@ -97,6 +95,15 @@ def search(query: str, max_results: int = 15) -> List[Dict]:
                 return text
 
         text = soup.body.get_text(separator=' ', strip=True)
+        text = re.sub(r'\s+', ' ', text)
+        return text
+    
+    def extract_main_content_readability(html) -> str:
+        """使用 readability-lxml 提取主要內容"""
+        doc = Document(html)
+        content_html = doc.summary()
+        soup = BeautifulSoup(content_html, 'html.parser')
+        text = soup.get_text(separator=' ', strip=True)
         text = re.sub(r'\s+', ' ', text)
         return text
 

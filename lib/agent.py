@@ -8,7 +8,7 @@ class Agent:
     def __init__(self, llm):
         """
         通用 Agent 基底類別
-        :param llm: 指定的 LLM 模型 (如 GPT-4o, Claude, LLaMA 3.3 70B, Mistral)
+        :param llm: gpt-4o, gpt-4o-mini, llama 3.3 70B
         """
         self.llm = llm
 
@@ -42,6 +42,7 @@ class Agent:
             completion = self.client.chat.completions.create(
                 model=self.llm,
                 messages=conversations,
+                parallel_tool_calls=False,
                 **kwargs
             )
             return completion.choices[0].message, completion.usage

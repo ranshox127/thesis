@@ -50,9 +50,9 @@ class Agent:
             completion = self.client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=conversations,
-                tool_choice="auto",
-                tools=tools
+                parallel_tool_calls=False,
+                **kwargs
             )
-            return completion.choices[0].message
+            return completion.choices[0].message, completion.usage
         else:
             raise NotImplementedError(f"LLM {self.llm} is not yet integrated.")

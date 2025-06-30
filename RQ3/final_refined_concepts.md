@@ -1,0 +1,20 @@
+- Encourage depth and specificity in analysis by incorporating detailed explanations and specific examples.
+- Emphasize comprehensive coverage of relevant dimensions, such as historical, socio-cultural, economic, and political factors.
+- Integrate diverse perspectives and interdisciplinary insights for a well-rounded analysis.
+- Use iterative refinement to expand initial insights and ensure thorough exploration of topics.
+- Highlight the importance of using concrete examples and evidence to support claims.
+- Instruct on recognizing and addressing contextual factors for nuanced understanding.
+- Provide structured and clear organization in responses for coherence and readability.
+- Ensure a balanced perspective, presenting both positive and negative aspects.
+- Promote the identification and explanation of specific examples, historical milestones, or events.
+- Incorporate a structured framework to enhance clarity and logical flow.
+- Use comparative analysis to provide nuanced insights and depth.
+- Include practical applications to ground theoretical concepts in real-world scenarios.
+- Ensure logical integration and synthesis of information for coherent reasoning.
+- Balance breadth and depth in exploration of topics.
+- Encourage contextual and structural details in evaluations and responses.
+- Reflect on broader implications and variability of topics.
+- Address challenges and reforms within the context.
+- Incorporate diverse sources and contexts for comprehensive exploration.
+- Emphasize the importance of contextual relevance and detail.
+- Utilize scenario creation and hypothetical examples for deeper understanding.

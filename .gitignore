@@ -1,6 +1,33 @@
-.env
+# Python bytecode files
 */__pycache__
+
+# Debug logs
 react_debug.log
 */react_debug.log
+
+# React summary files
 react_summary.json
 */react_summary.json
+
+# Environment variables
+.env
+
+# Git LFS objects
+.git/lfs/objects/9e/bf/9ebf84488498eaffa477ed67561bd7fcfb95f84f5fb01b4244f51af03a8c8ade
+.git/lfs/objects/cb/5c/cb5c07825556ebd3781b7fe2327ea2e1d5d2f84671b47c2ba926b8c0a803b507
+
+# Log and summary files
+RQ3.log
+RQ3_2.log
+RQ3_summary.json
+RQ3_summary_2.json
+RQ3_summary_3.json
+final_RQ3_summary.json
+record/CQ_Solver_debug_1.log
+record/CQ_Solver_debug_2.log
+record/CQ_Solver_debug_3.log
+record/final_llama_CQ_Solver_summary.json
+record/llama_mindsearch_summary.json
+record/llama_react_debug.log
+record/llama_summary.json
+result/final_llama_CQ_Solver_summary.json

@@ -118,7 +118,7 @@ class MindSearch:
         self.searcher = Agent(llm=llm)
         self.max_turns = max_turns
         self.planner_conversation = [
-            {"role": "developer", "content": system_prompt}]
+            {"role": "system", "content": system_prompt}]
         self.conversation_log = []  # 用於詳細記錄每一條訊息，不做傳入模型用
         self.total_tokens = []  # 用於詳細記錄每個resopnse的tokens數量
         self.questions = []
@@ -260,15 +260,14 @@ class MindSearch:
 
     def get_sub_answers(self, question, sub_questions):
         sub_answers = []
-        searcher_system_prompt = """You are an AI assistant designed to answer sub-questions.
-        You will be presented with original questions and sub-questions that you need to answer using a search engine.
-        Your task is to:
+        searcher_system_prompt = """You are an AI assistant designed to answer sub-questions. You will be presented with original questions and sub-questions that you need to answer using a search engine.
+        Your task is to.
         1. come up with the most appropriate query based on the original question and the sub-question.
         2. summarize the search results to answer the sub-question based on the original question and the sub-question."""
 
         for sub_question in sub_questions:
 
-            searcher_conversation = [{"role": "developer", "content": searcher_system_prompt},
+            searcher_conversation = [{"role": "system", "content": searcher_system_prompt},
                                      {"role": "user", "content": f"The parent question: {question}, the sub-question: {sub_question}"}]
 
             tool = [
@@ -397,21 +396,22 @@ class MindSearch:
 
         assistant_response = {"role": "assistant",
                               "tool_calls": response.tool_calls}
-
         self.planner_conversation.append(assistant_response)
-        self.conversation_log.append(assistant_response)
+
+        self.conversation_log.append(
+            {**assistant_response, "agent": "planner"})
 
         tool_call = response.tool_calls[0]
         state, feedback = self.handle_tool_call(tool_call)
 
         tool_response = {
-            "agent": "planner",
             "role": "tool",
             "tool_call_id": tool_call.id,
             "content": feedback,
         }
         self.planner_conversation.append(tool_response)
-        self.conversation_log.append(tool_response)
+
+        self.conversation_log.append({**tool_response, "agent": "planner"})
 
     def _save_summary(self):
         """Saves the ReAct session to JSON with ordered retrieved data."""
@@ -481,8 +481,12 @@ class MindSearch:
 
             # 2. Check if the LLM requested a function call
             if response.tool_calls:
-                assistant_response = {"agent": "planner", "role": "assistant",
+                assistant_response = {"role": "assistant",
                                       "tool_calls": response.tool_calls}
+                self.planner_conversation.append(assistant_response)
+
+                self.conversation_log.append(
+                    {**assistant_response, "agent": "planner"})
 
                 for tool_call in response.tool_calls:
                     state, feedback = self.handle_tool_call(tool_call)
@@ -492,38 +496,29 @@ class MindSearch:
                         turn -= 1
                         continue
 
-                    self.planner_conversation.append(assistant_response)
-                    self.conversation_log.append(assistant_response)
-
                     if state == "decompose":
                         tool_response = {
-                            "agent": "planner",
                             "role": "tool",
                             "tool_call_id": tool_call.id,
                             "content": json.dumps(feedback, ensure_ascii=False),
                         }
                         self.planner_conversation.append(tool_response)
-                        self.conversation_log.append(tool_response)
+
+                        self.conversation_log.append(
+                            {**tool_response, "agent": "planner"})
 
                         logging.info(f"sub-answers: {str(feedback)}")
 
                     elif state == "answer":
                         tool_response = {
-                            "agent": "planner",
                             "role": "tool",
                             "tool_call_id": tool_call.id,
                             "content": feedback,
                         }
                         self.planner_conversation.append(tool_response)
-                        self.conversation_log.append(tool_response)
 
-                        final_answer_request = {
-                            "role": "user",
-                            "content": (
-                                "Please organize the information you have gathered and write a complete and comprehensive answer to the original question.")}
-
-                        self.planner_conversation.append(final_answer_request)
-                        self.conversation_log.append(final_answer_request)
+                        self.conversation_log.append(
+                            {**tool_response, "agent": "planner"})
 
                         response, usage = self.planner.generate_response(
                             self.planner_conversation, tools=self.tools, tool_choice="none")
@@ -545,14 +540,6 @@ class MindSearch:
 
         logging.warning("Max turns reached. No definitive answer found.")
         self.final_answer()
-
-        final_answer_request = {
-            "role": "user",
-            "content": (
-                "Please organize the information you have gathered and write a complete and comprehensive answer to the original question.")}
-
-        self.planner_conversation.append(final_answer_request)
-        self.conversation_log.append(final_answer_request)
 
         response, usage = self.planner.generate_response(
             self.planner_conversation, tools=self.tools, tool_choice="none")
